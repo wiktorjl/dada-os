@@ -18,7 +18,6 @@
 #include "sys.h"
 #include "physmem.h"
 #include "vmm.h"
-#include "experiment/current/experiment.h"
 
 extern unsigned int * kernel_begin;
 extern unsigned int * kernel_end;
@@ -29,6 +28,7 @@ extern char cpu_name[15];
 
 void kmain(int * s)
 {   
+    /* Compute total kernel size based on symbols from the linker. */
     unsigned int kernel_size = &kernel_end - &kernel_begin;
 
     /* Point multi boot info structure to whatever is at EBX (set up by loader) */
@@ -37,18 +37,26 @@ void kmain(int * s)
     console_cls();
     cpuid();
     printk("Dada v0.0.1 | CPU:  %s | %u | 0x%x - 0x%x\n", cpu_name, kernel_size, &kernel_begin, &kernel_end);
+    
+    /* Initialize physical memory manager based on memory map passed in by multiboot boot loader */
     pmm_initialize_from_mboot(bi);
+
     printk("Stack: 0x%x - 0x%x (%d bytes)\n", &_stack_bottom, &_stack_top, &_stack_top - &_stack_bottom);
     printk("BIOS reported lower memory: %u KB\n", bi->memlow );
     printk("BIOS reported higher memory: %u KB\n", bi->memhigh );
+    
+    /* Setup gdt, idt, remap pic, setup irq handlers */
     setup_gdt();
     setup_idt();
     remap_pic();
     setup_irq_gates();
     flash_idt();
-    pmm_print_summary();
-    enable_interrupts();
+
+    /* Setup page tables and enable paging */
     vmm_init();
+
+    /* At this point we are ready for interrupts, so enable them */
+    enable_interrupts();
 }
 
 
