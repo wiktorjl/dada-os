@@ -55,6 +55,9 @@ void kmain(int * s)
     /* Setup page tables and enable paging */
     vmm_init();
 
+    /* Enable keyboard */
+    init_kbd();
+
     /* At this point we are ready for interrupts, so enable them */
     enable_interrupts();
 }
