@@ -1,3 +1,5 @@
+*.iso
+*.bin
 build/
 src/*.o
 *.out
