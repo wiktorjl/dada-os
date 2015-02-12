@@ -1,3 +1,9 @@
+/**
+ * Dada Kernel
+ *
+ * Wiktor Lukasik (wiktor@lukasik.org)
+ */
+
 #include "physmem.h"
 #include "vmm.h"
 #include "string.h"

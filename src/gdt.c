@@ -1,3 +1,9 @@
+/**
+ * Dada Kernel
+ *
+ * Wiktor Lukasik (wiktor@lukasik.org)
+ */
+
 #include "console.h"
 #include "gdt.h"
 

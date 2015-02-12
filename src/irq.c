@@ -1,3 +1,9 @@
+/**
+ * Dada Kernel
+ *
+ * Wiktor Lukasik (wiktor@lukasik.org)
+ */
+
 #include "irq.h"
 #include "sys.h"
 #include "console.h"

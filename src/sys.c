@@ -1,6 +1,5 @@
 /**
  * Dada Kernel
- * October 2014
  *
  * Wiktor Lukasik (wiktor@lukasik.org)
  */

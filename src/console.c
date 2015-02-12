@@ -1,12 +1,8 @@
-/*******************************************************************************
- *        
- * console.c
+/**
+ * Dada Kernel
  *
- * Wiktor Lukasik
- *
- * VGA driver to output text to the screen. Assumes 80x25 console.
- *
- ******************************************************************************/
+ * Wiktor Lukasik (wiktor@lukasik.org)
+ */
 
 #include "console.h"
 #include "io.h"

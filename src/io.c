@@ -1,3 +1,9 @@
+/**
+ * Dada Kernel
+ *
+ * Wiktor Lukasik (wiktor@lukasik.org)
+ */
+
 #include "io.h"
 
 void serial_configure_baud_rate(unsigned short com, unsigned short divisor)
