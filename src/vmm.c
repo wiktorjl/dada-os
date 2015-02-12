@@ -10,9 +10,12 @@
 #include "console.h"
 #include "math.h"
 
+/* ASM function to enable paging */
 extern void _enable_paging();
+/* Get contents of CR2 register, useful during page fault */
 extern unsigned char * _get_cr2();
 
+/* Points to block containing page directory */
 unsigned int * vmm_dir;
 
 void page_fault_handler() {
@@ -24,11 +27,7 @@ void vmm_set_entry_attribute(vmm_entry * entry, unsigned int attr) {
 }
 
 void vmm_set_entry_address(vmm_entry * entry, unsigned int addr) {
-    unsigned int mask = 4294963200;
-    unsigned int masked = *entry & mask;
-    unsigned int newaddr = masked | addr;
-    *entry |= newaddr;
-    //*entry = (*entry & VMM_MASK_PT_FRAME) | addr;
+    *entry = (*entry | ((*entry & VMM_MASK_PT_FRAME) | addr));
 }
 
 vmm_entry * vmm_create_page_directory() {
@@ -106,61 +105,4 @@ void vmm_init() {
 
 }
 
-void xvmm_init() {
 
-    // For now, we set up 4 mb to be identity mapped.
-    // 4mb = 1 block
-
-    int free_blk = 0; //pmm_reserve_next_free(); 
-    vmm_entry * page = 0;
-
-    free_blk = pmm_reserve_next_free(); 
-    vmm_entry * dentry = pmm_block_to_location(free_blk);
-    printk("VMMINIT: Page directory entry at location: 0x%x/%d\n", dentry, free_blk);
-    VMM_CLEAR_PAGE(dentry);
-    vmm_set_entry_attribute(dentry, VMM_MASK_PD_PRESENT);
-    vmm_set_entry_attribute(dentry, VMM_MASK_PD_RW);
-
-    vmm_entry phys_addr = 0; 
-    free_blk = pmm_reserve_next_free(); 
-    page = pmm_block_to_location(free_blk);
-    VMM_CLEAR_PAGE(page);
-    printk("VMMINIT: First page entry: 0x%x/%d\n", page, free_blk);
-    for(int i = 0; i < 1024; i++) {
-        //printk("VMMINIT: Allocated page %d at location: 0x%x\n", i, page); 
-        
-        //if(i > 5) break;
-        vmm_set_entry_attribute(page, VMM_MASK_PT_PRESENT);
-        vmm_set_entry_address(page, (unsigned int) phys_addr);
-        printk("\rVMMINIT: Page entry %d: 0x%x", i, page);
-        phys_addr += 4096;
-
-        if(i == 0) {
-            vmm_set_entry_address(dentry, (unsigned int) page);
-            //printk("VMMINIT: Set 0x%x as first entry in directory.\n", page);
-        }
-        //printk("\tVMMINIT: Page entry: 0x%x\n", *dentry);
-        page += 1;
-    }
-    printk("\nVMMINIT: Allocated pages.\n");
-    printk("VMMINIT: Page directory entry: 0x%x\n", *dentry);
-    vmm_dir = dentry;
-    //((unsigned int *) vmm_dir)[0] = page;
-
-    
-    //page |= [M#\
-    //vmm_dir[0] = 0;// page;
-    // Enable paging
-    printk("VMMINIT: Loading page directory.\n");
-    _load_page_directory(vmm_dir);
-
-    setup_idt_gate(0xe, page_fault_handler);
-
-    printk("VMMINIT: Enabling paging.\n");
-    _enable_paging();
-    printk("VMMINIT: Welcome in virtual memory!\n");
-
-    // reference 5 mb
-    unsigned int * x = 4194301;
-    *x = 7;
-}
