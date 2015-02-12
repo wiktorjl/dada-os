@@ -1,0 +1,11 @@
+set history save on
+set history filename ~/dasos/.gdb_history
+
+set disassembly-flavor intel
+file build/kernel.sym
+break kmain
+break experiment
+break _load_page_directory
+break _enable_paging
+target remote :1234
+
