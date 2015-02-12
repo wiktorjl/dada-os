@@ -1,0 +1,5 @@
+Sources:
+
+OSDev.org - http://wiki.osdev.org
+BrokenThorn OS Development Series - http://www.brokenthorn.com/Resources/OSDevIndex.html
+Simplix - http://www.julienlecomte.net/simplix/
