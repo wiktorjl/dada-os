@@ -27,13 +27,6 @@ extern int * _stack_bottom;
 extern int * _stack_top;
 extern char cpu_name[15];
 
-extern int _check_paging();
-extern void _load_page_directory(unsigned int * page_directory);
-extern void _enable_paging();
-
-unsigned int page_directory[1024] __attribute__((aligned(4096)));
-unsigned int first_page_table[1024] __attribute__((aligned(4096)));
- 
 void kmain(int * s)
 {   
     unsigned int kernel_size = &kernel_end - &kernel_begin;
