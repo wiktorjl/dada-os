@@ -70,6 +70,7 @@ clean:
 cleanswp: 
 	@echo "Removing swp files..."
 	rm -fv src/.*.swp
+	rm -fv src/*.*~
 
 makeiso:
 	@echo "Removing old ISO"
