@@ -75,21 +75,21 @@ void pmm_initialize_from_mboot(struct mbootinfo * bootInfo) {
     pmm_initialize((unsigned int) &kernel_end, total_size);
 
     // For each usable memory region, mark it in the map as availabile.
-    printk("Memory map: \n");
+    logk("Memory map: \n");
     for (i=0;i<parts;i++) {
         start = bootInfo->mmap_addr[i].BaseAddrLow;
         size = bootInfo->mmap_addr[i].LengthLow;
         end = start + size;
 
-        printk("  0x%x - 0x%x (%u bytes)", start, end, size);
+        logk("  0x%x - 0x%x (%u bytes)", start, end, size);
 
         if(1 == bootInfo->mmap_addr[i].Type) {
-            printk(" [usable]");
+            logk(" [usable]");
             pmm_add_memory_region(start, end);
         } else {
-            printk(" [reserved]");
+            logk(" [reserved]");
         }
-        printk("\n");
+        logk("\n");
     }
 
     // Ensure that memory occupied by kernel is marked as reserved.
