@@ -9,7 +9,7 @@ void kheap_init() {
     kheap_top = pmm_get_memory_size();
     kheap = kheap_top - KHEAP_SIZE;
     pmm_remove_memory_region(kheap, kheap_top);
-    printk("KHEAP INIT: Heap range: 0x%x-0x%x\n", kheap, kheap_top);
+    printk("Kernel heap: 0x%x-0x%x\n", kheap, kheap_top);
 }
 
 void * kmalloc(unsigned int n) {
