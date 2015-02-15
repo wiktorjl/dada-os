@@ -71,16 +71,6 @@ void setup_idt_gate(int gate, void (*func_base)()) {
 
 }
 
-/*
-void x(registers_t r) {
-    console_print("INTERRUPT "); console_printnum(r.int_no); console_print("\n");
-    asm volatile("cli");
-    console_print("INT INT INT\n");
-    //asm volatile("sti");
-    //asm volatile("iret");
-};
-*/
-
 struct isr_registers {
     unsigned int gs;
     unsigned int fs;
@@ -123,23 +113,12 @@ void default_handler(struct isr_registers args) { // registers_t r) {
     if(args.isr == 0xe) {
         panic("PAGE FAULT!");
     }
-    //if(args.isr == 13) {
-    //    int x = 3/0;
-    //    int y = 3+x;
-    //}
-    //if(args.isr == 0) {
-    //    outportb(0x20, 0x20);
-    //}
-    //asm volatile("cli");
-    //console_print("INTERRUPT ");// console_printnum(r.int_no); console_print("\n");
-    //console_print("DEFAULT ITERRUPT HANDLER!!!\n");
-    //asm volatile("sti");
-    //asm volatile("iret");
-}
 
-//void setup_idt() {
-    //setup_idt_gate(3, (unsigned int) x);
-//}
+    if(args.isr == 0) {
+        printk("TIC\n");    
+        outportb(0x20, 0x20);
+    }
+}
 
 void setup_idt() {
     memset(&idt_entries, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
