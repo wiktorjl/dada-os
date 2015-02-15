@@ -33,7 +33,7 @@ struct gdt_pointer {
 } __attribute__((__packed__));
 
 /* Build GDT entry */
-void setup_gdt_segment_descriptor(int entryn, unsigned int base, unsigned char sec, unsigned char gran);
+void setup_gdt_segment_descriptor(int i, unsigned int base_addr, unsigned int size, unsigned char sec, unsigned char granularity);
 
 /* Install GDT */
 void setup_gdt();

@@ -11,8 +11,7 @@
 struct gdt_segment_descriptor gdt_entries[NUM_GDT_ENTRIES];
 struct gdt_pointer gdt_ptr;
 
-void setup_gdt_segment_descriptor_bits(int i, unsigned int base_addr, unsigned int size, unsigned char sec, unsigned char granularity) {
-
+void setup_gdt_segment_descriptor(int i, unsigned int base_addr, unsigned int size, unsigned char sec, unsigned char granularity) {
     gdt_entries[i].seg_size = (size & 0xFFFF);
     gdt_entries[i].base_addr_1 = (base_addr & 0xFFFF);
     gdt_entries[i].base_addr_2 = (base_addr >> 16) & 0xFF;
@@ -20,11 +19,6 @@ void setup_gdt_segment_descriptor_bits(int i, unsigned int base_addr, unsigned i
     gdt_entries[i].seg_sec = sec;
     gdt_entries[i].seg_granularity = (size >> 16) & 0x0F;
     gdt_entries[i].seg_granularity |= granularity & 0xF0;
-   
-}
-
-void setup_gdt_segment_descriptor(int entryn, unsigned int base, unsigned char sec, unsigned char gran) {
-    setup_gdt_segment_descriptor_bits(entryn, 0, base, sec, gran); 
 }
 
 void flush_gdt() {
@@ -38,7 +32,7 @@ void setup_gdt() {
     gdt_ptr.size = gdt_size;
     gdt_ptr.base = gdt_base;
 
-    printk("GDT base address: 0x%x, size: %d\n", gdt_ptr.base, gdt_ptr.size);
+    logk("GDT base address: 0x%x, size: %d\n", gdt_ptr.base, gdt_ptr.size);
 
     // This is messy. See on-line resources for more explanation:
     //  http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html
@@ -74,11 +68,11 @@ void setup_gdt() {
     // 0xFA - 11111010 - user mode code 
     // 0xF2 - 11110010 - user mode data
 
-    setup_gdt_segment_descriptor(0, 0, 0, 0);
-    setup_gdt_segment_descriptor(1, 0xFFFFFFFF, 0x9A, 0xCF); // code 
-    setup_gdt_segment_descriptor(2, 0xFFFFFFFF, 0x92, 0xCF); // data
-    setup_gdt_segment_descriptor(3, 0xFFFFFFFF, 0xFA, 0xCF); // user mode code
-    setup_gdt_segment_descriptor(4, 0xFFFFFFFF, 0xF2, 0xCF); // user mode data
+    setup_gdt_segment_descriptor(0, 0, 0, 0, 0);
+    setup_gdt_segment_descriptor(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // code 
+    setup_gdt_segment_descriptor(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // data
+    setup_gdt_segment_descriptor(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // user mode code
+    setup_gdt_segment_descriptor(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // user mode data
 
     flush_gdt();    
 }
