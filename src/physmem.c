@@ -54,8 +54,11 @@ void pmm_initialize_from_mboot(struct mbootinfo * bootInfo) {
     unsigned int end;
     int i, parts;
 
+    LOGFUNC("pmm_initialize_from_boot");
+
     // Check how many regions are reported
     parts=((int)bootInfo->mmap_length)/sizeof(memoryMap);
+    logk("Number of memory regions reported: %d\n", parts);
 
     // Grab total memory size based on the maximum end address of a reported memory region
     for (i=0;i<parts;i++) {
@@ -64,6 +67,8 @@ void pmm_initialize_from_mboot(struct mbootinfo * bootInfo) {
         end = start + size;
         
         if(end > total_size) total_size = end;
+
+        logk("Memory region: %d - %d, %d\n", start, end, size);
     }
 
     // Initialize memory map based. Place it at the end of the kernel. Mark all memory as used.
@@ -76,7 +81,7 @@ void pmm_initialize_from_mboot(struct mbootinfo * bootInfo) {
         size = bootInfo->mmap_addr[i].LengthLow;
         end = start + size;
 
-        printk("  0x%x - 0x%x (%d bytes)", start, end, size);
+        printk("  0x%x - 0x%x (%u bytes)", start, end, size);
 
         if(1 == bootInfo->mmap_addr[i].Type) {
             printk(" [usable]");
@@ -92,10 +97,11 @@ void pmm_initialize_from_mboot(struct mbootinfo * bootInfo) {
     // Same foe region occupied by memory map
     pmm_remove_memory_region((unsigned int) &kernel_end, (unsigned int) &kernel_end + total_size / PMM_BLOCK_SIZE / 8);
 
-    printk("Total found usable memory: %d bytes\n", pmm_get_memory_size());
+    printk("Total found usable memory: %u bytes\n", pmm_get_memory_size());
 }
 
 void pmm_initialize(unsigned int where, int size) {
+    LOGFUNC("pmm_initialize");
     pmm_memory_map = (unsigned int *) where;
     pmm_total_memory_size = size;
     pmm_total_blocks = pmm_total_memory_size / PMM_BLOCK_SIZE;
@@ -104,6 +110,7 @@ void pmm_initialize(unsigned int where, int size) {
     pmm_memory_map_length_in_blocks = pmm_total_memory_size / PMM_BLOCK_SIZE / 8;
        
     // Mark all blocks to be reserved
+    logk("Memset the pmm bitmap\n");
     memset((unsigned int *)where, 0xFFFFFFFF, pmm_total_memory_size / PMM_BLOCK_SIZE / 8);
 }
 
@@ -157,6 +164,18 @@ void pmm_remove_memory_region(unsigned int start, unsigned int end) {
 
 int pmm_next_free() {
     for(int i = 0; i < pmm_total_blocks; i++) {
+        if(pmm_get_block(i) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int pmm_next_free_at(unsigned int loc) {
+    int startb = pmm_location_to_block(loc);
+
+    for(int i = startb; i < pmm_total_blocks; i++) {
         if(pmm_get_block(i) == 0) {
             return i;
         }

@@ -42,6 +42,8 @@ void pmm_remove_memory_region(unsigned int start, unsigned int end);
 
 /* Find next free block of memory. */
 int pmm_next_free();
+int pmm_next_free_at(unsigned int loc);
+
 /* Reserve memory block */
 int pmm_reserve_block(int block);
 /* Find & reserve next free block of memory. */

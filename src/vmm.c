@@ -14,6 +14,7 @@
 extern void _enable_paging();
 /* Get contents of CR2 register, useful during page fault */
 extern unsigned char * _get_cr2();
+extern unsigned int * vmmstart;
 
 /* Points to block containing page directory */
 unsigned int * vmm_dir;
@@ -31,13 +32,20 @@ void vmm_set_entry_address(vmm_entry * entry, unsigned int addr) {
 }
 
 vmm_entry * vmm_create_page_directory() {
-    int blk = pmm_reserve_next_free();
+    int freeblk = pmm_next_free_at(&vmmstart);
+
+    if(freeblk == -1) {
+        panic("Could not find free block for page directory!");
+    }
+
+    int blk = pmm_reserve_block(freeblk);
 
     if(blk == -1) {
-        panic("No more free blocks!");
+        panic("No more free blocks for page directory!");
     }
     
-    vmm_entry * dentry = pmm_block_to_location(blk);
+    vmm_entry * dentry = pmm_block_to_location(freeblk);
+    logk("VMM INIT: Page directory at 0x%x\n", dentry);
     VMM_CLEAR_PAGE(dentry);
 
     vmm_set_entry_attribute(dentry, VMM_MASK_PD_PRESENT);
@@ -47,13 +55,24 @@ vmm_entry * vmm_create_page_directory() {
 }
 
 vmm_entry * vmm_create_page_table() {
-    int blk = pmm_reserve_next_free();
+    int freeblk = pmm_next_free_at(&vmmstart);
+
+    if(freeblk == -1) {
+        panic("Could not find free block for page table!");
+    }
+
+    int blk = pmm_reserve_block(freeblk);
+
+    if(blk == -1) {
+        panic("No more free blocks for page table!");
+    }
 
     if(blk == -1) {
         panic("No more free blocks!");
     }
     
-    vmm_entry * pentry = pmm_block_to_location(blk);
+    vmm_entry * pentry = pmm_block_to_location(freeblk);
+    logk("VMM INIT: Page tables at 0x%x\n", pentry);
     VMM_CLEAR_PAGE(pentry);
 
     vmm_set_entry_attribute(pentry, VMM_MASK_PT_PRESENT);
@@ -68,15 +87,15 @@ void vmm_init() {
     
     total_ptables = CEIL(total_mem, 4096);
     total_pdirs = CEIL(total_ptables, 1024);
-    printk("VMM INIT: Total memory size: %d bytes\n", total_mem);
-    printk("VMM INIT: Page directories required: %d \n", total_pdirs);
-    printk("VMM INIT: Page tables required: %d \n", total_ptables);
+    logk("VMM INIT: Total memory size: %u bytes\n", total_mem);
+    logk("VMM INIT: Page directories required: %d \n", total_pdirs);
+    logk("VMM INIT: Page tables required: %d \n", total_ptables);
 
     unsigned int phys_addr = 0;
     vmm_entry * dir = vmm_create_page_directory();
     vmm_dir = dir;
    
-    printk("VMM INIT: Creating page directories and page tables...\n");
+    logk("VMM INIT: Creating page directories and page tables...\n");
     for(int pd = 0; pd < total_pdirs; pd++) {
         vmm_set_entry_attribute(dir, VMM_MASK_PD_PRESENT);
         vmm_set_entry_attribute(dir, VMM_MASK_PD_RW);
@@ -93,16 +112,14 @@ void vmm_init() {
         }
         dir += 1;
     }
-    printk("VMM INIT: Loading page directory.\n");
+    logk("VMM INIT: Loading page directory.\n");
     _load_page_directory(vmm_dir);
 
     setup_idt_gate(0xe, page_fault_handler);
 
-    printk("VMM INIT: Enabling paging.\n");
     _enable_paging();
-    printk("VMM INIT: Welcome in virtual memory!\n");
 
-
+    printk("VMM INIT: Paging enabled.\n");
 }
 
 

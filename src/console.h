@@ -36,6 +36,8 @@
 #define GET_CONSOLE_CUR_COL console_position % CONSOLE_COLUMNS
 #define RESET_CONSOLE_POSITION console_position = 0
 
+#define LOGFUNC(n) logk(">>> ENTERED FUNCTION %s\n", n)
+
 void console_update_cursor();
 void console_cls();
 void console_printchr(char c);
@@ -63,6 +65,6 @@ void write_serial(char a);
 int logk(const char *format, ...);
 /* Logging */
 //#define LOG_TO_CONSOLE 
-#define CONSOLE_TO_LOG
-
+//#define CONSOLE_TO_LOG
+//#define LOG_TO_SERIAL
 #endif

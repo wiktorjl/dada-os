@@ -30,4 +30,5 @@ SECTIONS
     }
 
     kernel_end = .;
+    vmmstart = .;
 }

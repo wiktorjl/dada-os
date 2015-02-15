@@ -344,10 +344,13 @@ int logk(const char *format, ...) {
     va_start(ap, format);
     len = vsnprintf(buf, sizeof(buf), format, ap);
 
+#ifdef LOG_TO_SERIAL
 #ifdef LOG_LINE_DECORATORS
     serial_print("LOG > ");
 #endif
+
     serial_print(buf);
+#endif
 
 #ifdef LOG_TO_CONSOLE
     console_print(buf);
