@@ -18,6 +18,9 @@
 #include "sys.h"
 #include "physmem.h"
 #include "vmm.h"
+#include "io.h"
+#include "kheap.h"
+//#include "pata.h"
 
 extern unsigned int * kernel_begin;
 extern unsigned int * kernel_end;
@@ -28,6 +31,8 @@ extern char cpu_name[15];
 
 void kmain(int * s)
 {   
+    disable_interrupts();
+
     /* Compute total kernel size based on symbols from the linker. */
     unsigned int kernel_size = &kernel_end - &kernel_begin;
 
@@ -42,8 +47,7 @@ void kmain(int * s)
     pmm_initialize_from_mboot(bi);
 
     printk("Stack: 0x%x - 0x%x (%d bytes)\n", &_stack_bottom, &_stack_top, &_stack_top - &_stack_bottom);
-    printk("BIOS reported lower memory: %u KB\n", bi->memlow );
-    printk("BIOS reported higher memory: %u KB\n", bi->memhigh );
+    printk("Lower memory: %u KB, higher memory: %u KB\n", bi->memlow , bi->memhigh );
     
     /* Setup gdt, idt, remap pic, setup irq handlers */
     setup_gdt();
@@ -53,6 +57,7 @@ void kmain(int * s)
     flash_idt();
 
     /* Setup page tables and enable paging */
+    kheap_init();
     vmm_init();
 
     /* Enable keyboard */
@@ -60,6 +65,8 @@ void kmain(int * s)
 
     /* At this point we are ready for interrupts, so enable them */
     enable_interrupts();
+
+    printk("Initialization finished.\n");    
 }
 
 
