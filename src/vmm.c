@@ -94,7 +94,8 @@ void vmm_init() {
     unsigned int phys_addr = 0;
     vmm_entry * dir = vmm_create_page_directory();
     vmm_dir = dir;
-   
+
+    printk("Page directory: 0x%x\n", dir);
     logk("VMM INIT: Creating page directories and page tables...\n");
     for(int pd = 0; pd < total_pdirs; pd++) {
         vmm_set_entry_attribute(dir, VMM_MASK_PD_PRESENT);
@@ -119,7 +120,7 @@ void vmm_init() {
 
     _enable_paging();
 
-    printk("VMM INIT: Paging enabled.\n");
+    logk("VMM INIT: Paging enabled.\n");
 }
 
 
