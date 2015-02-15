@@ -34,9 +34,25 @@ void outportb(unsigned short port, unsigned char data) {
     asm volatile ("outb %1, %0" : : "dN" (port), "a" (data));
 }
 
+void outportl(unsigned short port, unsigned int data) {
+    asm volatile ("outl %1, %0" : : "d" (port), "a" (data));
+}
+
 unsigned char inportb(unsigned short port) {
     unsigned char rv;
     asm volatile ("inb %1, %0" : "=a" (rv) : "dN" (port));
+    return rv;
+}
+
+unsigned int inportl(unsigned short port) {
+    unsigned int rv;
+    asm volatile ("inb %1, %0" : "=a" (rv) : "d" (port));
+    return rv;
+}
+
+uint16_t inportws(unsigned short port) {
+    uint16_t rv;
+    asm volatile ("inb %1, %0" : "=a" (rv) : "d" (port));
     return rv;
 }
 

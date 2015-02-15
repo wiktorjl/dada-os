@@ -5,6 +5,7 @@
  */
 #ifndef sys_h
 #define sys_h
+#include "types.h"
 
 /* Contains name of the CPU as reported by cpuid. Populated by void cpuid(); */
 char cpu_name[15];
@@ -44,10 +45,13 @@ struct mbootinfo {
 void cpuid();
 
 /* Writes data to port */
-void outportb(unsigned short _port, unsigned char _data);
+void outportb(unsigned short port, unsigned char data);
+void outportl(unsigned short port, unsigned int data);
 
 /* Reads data from a port */
-unsigned char inportb(unsigned short _port);
+unsigned char inportb(unsigned short port);
+unsigned int inportl(unsigned short port);
+uint16_t inportws(unsigned short port);
 
 /* Keep calm and panic. */
 void panic(char * msg);
