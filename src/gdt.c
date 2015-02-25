@@ -15,8 +15,8 @@ struct gdt_pointer gdt_ptr;
 
 void gdt_build_segment_descriptor(int i, uint32_t base_addr, uint32_t size, uint8_t flags, uint8_t granularity) {
 
-	// Set segment size
-	gdt_entries[i].limit_0_15 = (size & 0xFFFF);
+    // Set segment size
+    gdt_entries[i].limit_0_15 = (size & 0xFFFF);
     gdt_entries[i].limit_16_19 = ((size >> 16) & 0xFFFF);
 
     // Set segment start address
@@ -46,32 +46,16 @@ void gdt_init() {
     gdt_build_segment_descriptor(0, 0, 0, 0, 0);
 
     // Code super-user segment
-     gdt_build_segment_descriptor(1,
-    		GDT_BASE_SEGMENT_ADDRESS,
-			GDT_SEGMENT_SIZE,
-			GDT_ATTR_CODE_SUPER_MODE,
-			GDT_ATTR_DEFAULT_GRANULARITY);
+    gdt_build_segment_descriptor(1, GDT_BASE_SEGMENT_ADDRESS, GDT_SEGMENT_SIZE, GDT_ATTR_CODE_SUPER_MODE, GDT_ATTR_DEFAULT_GRANULARITY);
 
     // Data super-user segment
-    gdt_build_segment_descriptor(2,
-    		GDT_BASE_SEGMENT_ADDRESS,
-			GDT_SEGMENT_SIZE,
-			GDT_ATTR_DATA_SUPER_MODE,
-			GDT_ATTR_DEFAULT_GRANULARITY);
+    gdt_build_segment_descriptor(2, GDT_BASE_SEGMENT_ADDRESS, GDT_SEGMENT_SIZE, GDT_ATTR_DATA_SUPER_MODE, GDT_ATTR_DEFAULT_GRANULARITY);
 
     // Code user segment
-    gdt_build_segment_descriptor(3,
-    		GDT_BASE_SEGMENT_ADDRESS,
-			GDT_SEGMENT_SIZE,
-			GDT_ATTR_CODE_USER_MODE,
-			GDT_ATTR_DEFAULT_GRANULARITY);
+    gdt_build_segment_descriptor(3, GDT_BASE_SEGMENT_ADDRESS, GDT_SEGMENT_SIZE, GDT_ATTR_CODE_USER_MODE, GDT_ATTR_DEFAULT_GRANULARITY);
 
     // Data user segment
-    gdt_build_segment_descriptor(4,
-    		GDT_BASE_SEGMENT_ADDRESS,
-			GDT_SEGMENT_SIZE,
-			GDT_ATTR_DATA_USER_MODE,
-			GDT_ATTR_DEFAULT_GRANULARITY);
+    gdt_build_segment_descriptor(4, GDT_BASE_SEGMENT_ADDRESS, GDT_SEGMENT_SIZE, GDT_ATTR_DATA_USER_MODE, GDT_ATTR_DEFAULT_GRANULARITY);
 
     // Load GDT
     gdt_flush();
