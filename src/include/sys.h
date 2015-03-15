@@ -61,15 +61,6 @@ struct cpu_registers {
 /* Executes cpuid instruction and populates cpu_name with name of the processor. */
 void cpuid();
 
-/* Writes data to port */
-void outportb(unsigned short port, unsigned char data);
-void outportl(unsigned short port, unsigned int data);
-
-/* Reads data from a port */
-unsigned char inportb(unsigned short port);
-unsigned int inportl(unsigned short port);
-uint16_t inportws(unsigned short port);
-
 /* Keep calm and panic. */
 void panic(char * msg);
 

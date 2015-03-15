@@ -1,5 +1,5 @@
 extern idt_isr_default_handler
-extern default_irq_handler
+extern irq_default_handler
 extern kbd_handler
 extern page_fault_handler
 
@@ -86,7 +86,7 @@ irq%1:
     push es
     push fs
     push gs
-    call default_irq_handler
+    call irq_default_handler
     pop gs
     pop fs
     pop es

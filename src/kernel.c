@@ -10,17 +10,17 @@
 
 /* This is kernel. */
 #include "console.h"
-#include "types.h"
-#include "string.h"
-#include "idt.h"
 #include "gdt.h"
-#include "irq.h"
-#include "sys.h"
-#include "physmem.h"
-#include "vmm.h"
 #include "io.h"
-#include "kheap.h"
+#include "idt.h"
 #include "kbd.h"
+#include "kheap.h"
+#include "physmem.h"
+#include "pic.h"
+#include "string.h"
+#include "sys.h"
+#include "types.h"
+#include "vmm.h"
 
 //#include "pata.h"
 
@@ -53,9 +53,9 @@ void kmain(int * s)
     
     /* Setup gdt, idt, remap pic, setup irq handlers */
     gdt_init();
-    //remap_pic();
     idt_init();
-    //setup_irq_gates();
+    pic_init();
+    idt_init_irq();
     idt_flush();
 
     /* Setup page tables and enable paging */
@@ -66,7 +66,7 @@ void kmain(int * s)
     init_kbd();
 
     /* At this point we are ready for interrupts, so enable them */
-    // Disabled temporarily until IRQ re-done enable_interrupts();
+    enable_interrupts();
     printk("Initialization finished.\n");    
 
 }

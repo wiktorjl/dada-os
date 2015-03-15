@@ -4,6 +4,7 @@
  * Wiktor Lukasik (wiktor@lukasik.org)
  */
 
+#include "io.h"
 #include "types.h"
 #include "idt.h"
 #include "string.h"
@@ -46,6 +47,23 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+extern void irq0();
+extern void irq1();
+extern void irq2();
+extern void irq3();
+extern void irq4();
+extern void irq5();
+extern void irq6();
+extern void irq7();
+extern void irq8();
+extern void irq9();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
+
 void enable_interrupts() {
     asm volatile("sti");
 }
@@ -79,14 +97,14 @@ void idt_isr_default_handler(struct cpu_registers args) { // registers_t r) {
     printk(">>> INTERRUPT: INT# 0x%x ERR# 0x%x\n", args.isr, args.err);
     print_registers(args);
     
-//    if(args.isr == 0xe) {
-//        panic("PAGE FAULT!");
-//    }
-//
-//    if(args.isr == 0) {
-//        printk("TIC\n");
-//        outportb(0x20, 0x20);
-//    }
+    if(args.isr == 0xe) {
+        panic("PAGE FAULT!");
+    }
+
+    if(args.isr == 0) {
+        printk("TIC\n");
+        outportb(0x20, 0x20);
+    }
 
 }
 
@@ -125,5 +143,55 @@ void idt_init() {
     idt_setup_gate(29, &isr29);
     idt_setup_gate(30, &isr30);
     idt_setup_gate(31, &isr31);
+}
+
+void idt_init_irq() {
+    idt_setup_gate(32, irq0);
+    idt_setup_gate(33, irq1);
+    idt_setup_gate(34, irq2);
+    idt_setup_gate(35, irq3);
+    idt_setup_gate(36, irq4);
+    idt_setup_gate(37, irq5);
+    idt_setup_gate(38, irq6);
+    idt_setup_gate(39, irq7);
+    idt_setup_gate(40, irq8);
+    idt_setup_gate(41, irq9);
+    idt_setup_gate(42, irq10);
+    idt_setup_gate(43, irq11);
+    idt_setup_gate(44, irq12);
+    idt_setup_gate(45, irq13);
+    idt_setup_gate(46, irq14);
+    idt_setup_gate(47, irq15);
+}
+
+void irq_ack(unsigned int irq_no) {
+    if (irq_no >= 12) {
+        outportb(0xA0, 0x20);
+    }
+    outportb(0x20, 0x20);
+}
+
+void irq_default_handler(struct irq_registers regs) {
+
+    // Timer
+    if(regs.irq == 0x20) {
+        outportb(0x20, 0x20);
+        outportb(0xa0,0x20);
+        return;
+    }
+
+    // Keyboard
+    if(regs.irq == 0x21) {
+        printk("KEY\n");
+        inportb(0x60);
+    }
+
+    //irq_ack(regs.irq);
+    //outportb(0x20, 0x20);
+    //outportb(0xa0,0x20);
+    //maskIRQ(0x0);
+    return;
+
+    //irq_ack(irqno);
 }
 

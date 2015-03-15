@@ -6,10 +6,10 @@
 
 #include "console.h"
 #include "idt.h"
-#include "irq.h"
 #include "kbd.h"
 #include "keymap.h"
 #include "sys.h"
+#include "io.h"
 
 extern void isrkbd();
 unsigned short *keymap = uskbd;  

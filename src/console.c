@@ -15,10 +15,10 @@ unsigned char * videoram = (unsigned char *) 0xb8000;
 
 /* Redraws cursor at console_position. */
 void console_update_cursor() {
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (unsigned char)(console_position&0xFF));
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (unsigned char )((console_position>>8)&0xFF));
+    outportb(0x3D4, 0x0F);
+    outportb(0x3D5, (unsigned char)(console_position&0xFF));
+    outportb(0x3D4, 0x0E);
+    outportb(0x3D5, (unsigned char )((console_position>>8)&0xFF));
 }
 
 /* Clear screen, works by filling VGA buffer with 0s. */
@@ -361,9 +361,9 @@ int logk(const char *format, ...) {
 }
 
 void write_serial(char a) {
-   while (is_transmit_empty() == 0);
+   while (io_is_transmit_empty() == 0);
  
-   outb(PORT,a);
+   outportb(IO_PORT,a);
 }
 
 void print_registers(struct cpu_registers regs) {
