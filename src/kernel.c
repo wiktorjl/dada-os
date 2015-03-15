@@ -20,6 +20,8 @@
 #include "vmm.h"
 #include "io.h"
 #include "kheap.h"
+#include "kbd.h"
+
 //#include "pata.h"
 
 extern unsigned int * kernel_begin;
@@ -50,23 +52,23 @@ void kmain(int * s)
     printk("Lower memory: %u KB, higher memory: %u KB\n", bi->memlow , bi->memhigh );
     
     /* Setup gdt, idt, remap pic, setup irq handlers */
-    setup_gdt();
-    setup_idt();
-    remap_pic();
-    setup_irq_gates();
-    flash_idt();
+    gdt_init();
+    //remap_pic();
+    idt_init();
+    //setup_irq_gates();
+    idt_flush();
 
     /* Setup page tables and enable paging */
     kheap_init();
-    vmm_init();
+    //vmm_init();
 
     /* Enable keyboard */
     init_kbd();
 
     /* At this point we are ready for interrupts, so enable them */
-    enable_interrupts();
-
+    // Disabled temporarily until IRQ re-done enable_interrupts();
     printk("Initialization finished.\n");    
+
 }
 
 

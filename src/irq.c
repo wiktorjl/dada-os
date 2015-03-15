@@ -49,22 +49,22 @@ void remap_pic() {
 }
 
 void setup_irq_gates() {
-    setup_idt_gate(32, irq0);
-    setup_idt_gate(33, irq1);
-    setup_idt_gate(34, irq2);
-    setup_idt_gate(35, irq3);
-    setup_idt_gate(36, irq4);
-    setup_idt_gate(37, irq5);
-    setup_idt_gate(38, irq6);
-    setup_idt_gate(39, irq7);
-    setup_idt_gate(40, irq8);
-    setup_idt_gate(41, irq9);
-    setup_idt_gate(42, irq10);
-    setup_idt_gate(43, irq11);
-    setup_idt_gate(44, irq12);
-    setup_idt_gate(45, irq13);
-    setup_idt_gate(46, irq14);
-    setup_idt_gate(47, irq15);
+    idt_setup_gate(32, irq0);
+    idt_setup_gate(33, irq1);
+    idt_setup_gate(34, irq2);
+    idt_setup_gate(35, irq3);
+    idt_setup_gate(36, irq4);
+    idt_setup_gate(37, irq5);
+    idt_setup_gate(38, irq6);
+    idt_setup_gate(39, irq7);
+    idt_setup_gate(40, irq8);
+    idt_setup_gate(41, irq9);
+    idt_setup_gate(42, irq10);
+    idt_setup_gate(43, irq11);
+    idt_setup_gate(44, irq12);
+    idt_setup_gate(45, irq13);
+    idt_setup_gate(46, irq14);
+    idt_setup_gate(47, irq15);
 }
 
 void irq_ack(unsigned int irq_no) {

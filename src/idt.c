@@ -8,8 +8,10 @@
 #include "idt.h"
 #include "string.h"
 #include "console.h"
+#include "sys.h"
+#include "gdt.h"
 
-extern struct idt_entry idt_entries[IDT_NUM_ENTRIES];
+idt_entry idt_entries[IDT_NUM_ENTRIES];
 
 extern void isr0();
 extern void isr1();
@@ -52,108 +54,76 @@ void disable_interrupts() {
     asm volatile("cli");
 }
 
-void flash_idt() {
-    struct idt_desc idtdesc;
+void idt_flush() {
+    idtr idtdesc;
 
-    idtdesc.idt_size = sizeof(struct idt_entry) * IDT_NUM_ENTRIES;
+    idtdesc.idt_limit = sizeof(struct idt_entry) * IDT_NUM_ENTRIES;
     idtdesc.idt_addr = (uint32_t) &idt_entries;
 
     asm volatile("lidt %0" : : "m" (idtdesc) : "memory");
 }
 
-void setup_idt_gate(int gate, void (*func_base)()) {
+void idt_setup_gate(int gate, void (*func_base)()) {
     unsigned int base = (unsigned int) func_base;
-    idt_entries[gate].base_low = base & 0xFFFF;
-    idt_entries[gate].seg_sel= 0x08;
+    idt_entries[gate].base_address_0_15 = base & 0xFFFF;
+    /* First entry in GDT, superuser code segment. Remember GDT entries are 8 bytes and first is NULL */
+    idt_entries[gate].segment_selector= GDT_SEGMENT_SUPER_CODE * 8 ;
     idt_entries[gate].gap = 0;
-    idt_entries[gate].flags = 0x8E | 0x60;
-    idt_entries[gate].base_high = (base >> 16) & 0xFFFF;;
+    idt_entries[gate].zero = 0;
+    idt_entries[gate].flags = IDT_DESCRIPTOR_SEGMENT_PRESENT | IDT_PRIV_KERNEL | IDT_GATE_SIZE_32 | IDT_DESCRIPTOR_TYPE_INTERRUPT; //0x8E;
+    idt_entries[gate].base_address_16_31 = (base >> 16) & 0xFFFF;;
 
 }
 
-struct isr_registers {
-    unsigned int gs;
-    unsigned int fs;
-    unsigned int es;
-    unsigned int ds;
-    unsigned int edi;
-    unsigned int esi;
-    unsigned int ebp;
-    unsigned int esp;
-    unsigned int ebx;
-    unsigned int edx;
-    unsigned int ecx;
-    unsigned int eax;
-    unsigned int isr;
-    unsigned int err;
-
-};
-
-void print_registers(struct isr_registers regs) {
-   console_print("GS: "); console_printhex(regs.gs);
-   console_print(" FS: "); console_printhex(regs.fs);
-   console_print(" ES: "); console_printhex(regs.es);
-   console_print(" DS: "); console_printhex(regs.ds);
-   console_print(" EDI: "); console_printhex(regs.edi);
-   console_print(" ESI: "); console_printhex(regs.esi);
-   console_print(" EBP: "); console_printhex(regs.ebp);
-   console_print(" ESP: "); console_printhex(regs.esp);
-   console_print(" EBX: "); console_printhex(regs.ebx);
-   console_print(" EDX: "); console_printhex(regs.edx);
-   console_print(" ECX: "); console_printhex(regs.ecx);
-   console_print(" EAX: "); console_printhex(regs.eax);
-   console_print("\n");
-}
-
-void default_handler(struct isr_registers args) { // registers_t r) {
-    console_print(">>> INTERRUPT: "); console_print(" INT# "); console_printhex(args.isr); 
-    console_print(" ERR# "); console_printhex(args.err); console_print("\n");
+void idt_isr_default_handler(struct cpu_registers args) { // registers_t r) {
+    printk(">>> INTERRUPT: INT# 0x%x ERR# 0x%x\n", args.isr, args.err);
     print_registers(args);
     
-    if(args.isr == 0xe) {
-        panic("PAGE FAULT!");
-    }
+//    if(args.isr == 0xe) {
+//        panic("PAGE FAULT!");
+//    }
+//
+//    if(args.isr == 0) {
+//        printk("TIC\n");
+//        outportb(0x20, 0x20);
+//    }
 
-    if(args.isr == 0) {
-        printk("TIC\n");    
-        outportb(0x20, 0x20);
-    }
 }
 
-void setup_idt() {
-    memset(&idt_entries, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
+void idt_init() {
+    memset(&idt_entries, 0, sizeof(idt_entry) * IDT_NUM_ENTRIES);
     
-    setup_idt_gate(0, &isr0);
-    setup_idt_gate(1, &isr1);
-    setup_idt_gate(2, &isr2);
-    setup_idt_gate(3, &isr3);
-    setup_idt_gate(4, &isr4);
-    setup_idt_gate(5, &isr5);
-    setup_idt_gate(6, &isr6);
-    setup_idt_gate(7, &isr7);
-    setup_idt_gate(8, &isr8);
-    setup_idt_gate(9, &isr9);
-    setup_idt_gate(10, &isr10);
-    setup_idt_gate(11, &isr11);
-    setup_idt_gate(12, &isr12);
-    setup_idt_gate(13, &isr13);
-    setup_idt_gate(14, &isr14);
-    setup_idt_gate(15, &isr15);
-    setup_idt_gate(16, &isr16);
-    setup_idt_gate(17, &isr17);
-    setup_idt_gate(18, &isr18);
-    setup_idt_gate(19, &isr19);
-    setup_idt_gate(20, &isr20);
-    setup_idt_gate(21, &isr21);
-    setup_idt_gate(22, &isr22);
-    setup_idt_gate(23, &isr23);
-    setup_idt_gate(24, &isr24);
-    setup_idt_gate(25, &isr25);
-    setup_idt_gate(26, &isr26);
-    setup_idt_gate(27, &isr27);
-    setup_idt_gate(28, &isr28);
-    setup_idt_gate(29, &isr29);
-    setup_idt_gate(30, &isr30);
-    setup_idt_gate(31, &isr31);
+    idt_setup_gate(0, &isr0);
+    idt_setup_gate(1, &isr1);
+    idt_setup_gate(2, &isr2);
+    idt_setup_gate(3, &isr3);
+    idt_setup_gate(4, &isr4);
+    idt_setup_gate(5, &isr5);
+    idt_setup_gate(6, &isr6);
+    idt_setup_gate(7, &isr7);
+    idt_setup_gate(8, &isr8);
+    idt_setup_gate(9, &isr9);
+    idt_setup_gate(10, &isr10);
+    idt_setup_gate(11, &isr11);
+    idt_setup_gate(12, &isr12);
+    idt_setup_gate(13, &isr13);
+    idt_setup_gate(14, &isr14);
+    idt_setup_gate(15, &isr15);
+    idt_setup_gate(16, &isr16);
+    idt_setup_gate(17, &isr17);
+    idt_setup_gate(18, &isr18);
+    idt_setup_gate(19, &isr19);
+    idt_setup_gate(20, &isr20);
+    idt_setup_gate(21, &isr21);
+    idt_setup_gate(22, &isr22);
+    idt_setup_gate(23, &isr23);
+    idt_setup_gate(24, &isr24);
+    idt_setup_gate(25, &isr25);
+    idt_setup_gate(26, &isr26);
+    idt_setup_gate(27, &isr27);
+    idt_setup_gate(28, &isr28);
+    idt_setup_gate(29, &isr29);
+    idt_setup_gate(30, &isr30);
+    idt_setup_gate(31, &isr31);
 }
 

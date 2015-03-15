@@ -8,6 +8,12 @@
 
 #define NUM_GDT_ENTRIES 5
 
+#define GDT_SEGMENT_SUPER_CODE 1
+#define GDT_SEGMENT_SUPER_DATA 2
+#define GDT_SEGMENT_USER_CODE 3
+#define GDT_SEGMENT_USER_DATA 4
+
+
 #define GDT_BASE_SEGMENT_ADDRESS                    0x0
 #define GDT_SEGMENT_SIZE                            0xFFFFFFFF // 32 bit address
 

@@ -1,4 +1,4 @@
-extern default_handler
+extern idt_isr_default_handler
 extern default_irq_handler
 extern kbd_handler
 extern page_fault_handler
@@ -13,7 +13,7 @@ isr%1:
     push es
     push fs
     push gs
-    call default_handler
+    call idt_isr_default_handler
     pop gs
     pop fs
     pop es
@@ -23,35 +23,17 @@ isr%1:
     iret
 %endmacro
 
-global isrkbd
-isrkbd:
-    push 0
-    push 33
-    pushad
-    push ds
-    push es
-    push fs
-    push gs
-    call kbd_handler
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popad
-    add esp, 8
-    iret
-
 %macro ISR_ERR 1
 global isr%1
 isr%1:
-    push 0
+    push 0 ; This needs to be error # from above of esp
     push %1
     pushad
     push ds
     push es
     push fs
     push gs
-    call default_handler
+    call idt_isr_default_handler
     pop gs
     pop fs
     pop es
@@ -60,24 +42,6 @@ isr%1:
     add esp, 8
     iret
 %endmacro
-
-global isrpf
-isrpf:
-    push 0
-    push 14
-    pushad
-    push ds
-    push es
-    push fs
-    push gs
-    call page_fault_handler 
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popad
-    add esp, 8
-    iret
 
 ISR_DEFAULT 0
 ISR_DEFAULT 1
@@ -96,7 +60,7 @@ ISR_ERR 13
 ISR_ERR 14
 ISR_DEFAULT 15
 ISR_DEFAULT 16
-ISR_DEFAULT 17
+ISR_ERR 17
 ISR_DEFAULT 18
 ISR_DEFAULT 19
 ISR_DEFAULT 20
@@ -129,16 +93,6 @@ irq%1:
     pop ds
     popad
     add esp, 8
-
-    ;push eax
-    ;push edx
-    ;xor eax, eax
-    ;xor edx, edx
-    ;mov edx, 0x20
-    ;mov eax, edx
-    ;out dx, eax
-   ; pop edx
-    ;pop eax
     iret
 %endmacro
 
@@ -159,3 +113,38 @@ IRQ_DEFAULT 13, 45
 IRQ_DEFAULT 14, 46
 IRQ_DEFAULT 15, 47
 
+global isrkbd
+isrkbd:
+    push 0
+    push 33
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    call kbd_handler
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+    add esp, 8
+    iret
+
+global isrpf
+isrpf:
+    push 0
+    push 14
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    call page_fault_handler
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+    add esp, 8
+    iret

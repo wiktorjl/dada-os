@@ -58,6 +58,8 @@ int pmm_location_to_block(unsigned int loc);
 /* Prints small summary of physical memory manager internal state. */
 void pmm_print_summary();
 
+int pmm_block_to_location(int blk);
+
 /* Diagnostic functions */
 void pmm_dump_mm();
 int pmm_get_total_blocks();

@@ -41,6 +41,23 @@ struct mbootinfo {
     unsigned long bootloader_name;
 };
 
+struct cpu_registers {
+    unsigned int gs;
+    unsigned int fs;
+    unsigned int es;
+    unsigned int ds;
+    unsigned int edi;
+    unsigned int esi;
+    unsigned int ebp;
+    unsigned int esp;
+    unsigned int ebx;
+    unsigned int edx;
+    unsigned int ecx;
+    unsigned int eax;
+    unsigned int isr;
+    unsigned int err;
+};
+
 /* Executes cpuid instruction and populates cpu_name with name of the processor. */
 void cpuid();
 

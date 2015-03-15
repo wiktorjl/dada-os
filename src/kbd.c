@@ -44,7 +44,7 @@ void kbd_handler() {
 }
 
 void init_kbd(void) {
-    setup_idt_gate(KBD_IRQ, isrkbd);        
+    idt_setup_gate(KBD_IRQ, isrkbd);        
 }
 
 

@@ -9,9 +9,12 @@
 #include "string.h"
 #include "console.h"
 #include "math.h"
+#include "idt.h"
 
 /* ASM function to enable paging */
 extern void _enable_paging();
+extern void _load_page_directory();
+
 /* Get contents of CR2 register, useful during page fault */
 extern unsigned char * _get_cr2();
 extern unsigned int * vmmstart;
@@ -32,7 +35,7 @@ void vmm_set_entry_address(vmm_entry * entry, unsigned int addr) {
 }
 
 vmm_entry * vmm_create_page_directory() {
-    int freeblk = pmm_next_free_at(&vmmstart);
+    int freeblk = (int) pmm_next_free_at((unsigned int)&vmmstart);
 
     if(freeblk == -1) {
         panic("Could not find free block for page directory!");
@@ -44,7 +47,7 @@ vmm_entry * vmm_create_page_directory() {
         panic("No more free blocks for page directory!");
     }
     
-    vmm_entry * dentry = pmm_block_to_location(freeblk);
+    vmm_entry * dentry = (vmm_entry *) pmm_block_to_location(freeblk);
     logk("VMM INIT: Page directory at 0x%x\n", dentry);
     VMM_CLEAR_PAGE(dentry);
 
@@ -55,7 +58,7 @@ vmm_entry * vmm_create_page_directory() {
 }
 
 vmm_entry * vmm_create_page_table() {
-    int freeblk = pmm_next_free_at(&vmmstart);
+    int freeblk = (int) pmm_next_free_at((unsigned int)&vmmstart);
 
     if(freeblk == -1) {
         panic("Could not find free block for page table!");
@@ -71,7 +74,7 @@ vmm_entry * vmm_create_page_table() {
         panic("No more free blocks!");
     }
     
-    vmm_entry * pentry = pmm_block_to_location(freeblk);
+    vmm_entry * pentry = (vmm_entry *) pmm_block_to_location(freeblk);
     logk("VMM INIT: Page tables at 0x%x\n", pentry);
     VMM_CLEAR_PAGE(pentry);
 
@@ -101,7 +104,7 @@ void vmm_init() {
         vmm_set_entry_attribute(dir, VMM_MASK_PD_PRESENT);
         vmm_set_entry_attribute(dir, VMM_MASK_PD_RW);
         vmm_entry * ptable = vmm_create_page_table();
-        vmm_set_entry_address(dir, ptable);
+        vmm_set_entry_address(dir, (unsigned int) ptable);
 
         vmm_entry * page = ptable;
         int entry_count = 0;
@@ -116,7 +119,7 @@ void vmm_init() {
     logk("VMM INIT: Loading page directory.\n");
     _load_page_directory(vmm_dir);
 
-    setup_idt_gate(0xe, page_fault_handler);
+    idt_setup_gate(0xe, page_fault_handler);
 
     _enable_paging();
 

@@ -6,6 +6,7 @@
 
 #include "console.h"
 #include "io.h"
+#include "sys.h"
 
 /* Current linear position in video buffer */
 int console_position = 0;
@@ -364,5 +365,21 @@ void write_serial(char a) {
  
    outb(PORT,a);
 }
+
+void print_registers(struct cpu_registers regs) {
+    printk("GS: 0x%x ", regs.gs);
+    printk("FS: 0x%x ", regs.fs);
+    printk("ES: 0x%x ", regs.es);
+    printk("DS: 0x%x ", regs.ds);
+    printk("EDI: 0x%x ", regs.edi);
+    printk("ESI: 0x%x ", regs.esi);
+    printk("EBP: 0x%x ", regs.ebp);
+    printk("ESP: 0x%x ", regs.esp);
+    printk("EBX: 0x%x ", regs.ebx);
+    printk("EDX: 0x%x ", regs.edx);
+    printk("ECX: 0x%x ", regs.ecx);
+    printk("EAX: 0x%x\n", regs.eax);
+}
+
 
 

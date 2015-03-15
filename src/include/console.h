@@ -4,6 +4,7 @@
  * Wiktor Lukasik (wiktor@lukasik.org)
  */
 #include "types.h"
+#include "sys.h"
 
 #ifndef console_h
 #define console_h
@@ -45,6 +46,7 @@ void console_print(char * str);
 void console_printnl(char * str);
 void console_printnum(int i);
 void console_printhex(int i);
+void print_registers(struct cpu_registers regs);
 
 /* Source: https://github.com/klange/toaruos/blob/master/kernel/include/va_list.h */
 typedef __builtin_va_list va_list;
@@ -64,7 +66,8 @@ int printk(const char *format, ...);
 void write_serial(char a);
 int logk(const char *format, ...);
 /* Logging */
-//#define LOG_TO_CONSOLE 
-//#define CONSOLE_TO_LOG
-//#define LOG_TO_SERIAL
+//#define LOG_TO_CONSOLE
+#define CONSOLE_TO_LOG
+#define LOG_TO_SERIAL
 #endif
+
