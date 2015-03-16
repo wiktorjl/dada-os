@@ -2,6 +2,7 @@ extern idt_isr_default_handler
 extern irq_default_handler
 extern kbd_handler
 extern page_fault_handler
+extern pit_irq_handler
 
 %macro ISR_DEFAULT 1
 global isr%1
@@ -123,6 +124,24 @@ isrkbd:
     push fs
     push gs
     call kbd_handler
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+    add esp, 8
+    iret
+
+global isrtimer
+isrtimer:
+    push 0
+    push 33
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    call pit_irq_handler
     pop gs
     pop fs
     pop es

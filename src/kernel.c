@@ -21,6 +21,7 @@
 #include "sys.h"
 #include "types.h"
 #include "vmm.h"
+#include "pit.h"
 
 //#include "pata.h"
 
@@ -54,8 +55,9 @@ void kmain(int * s)
     /* Setup gdt, idt, remap pic, setup irq handlers */
     gdt_init();
     idt_init();
-    pic_init();
     idt_init_irq();
+    pic_init();
+    pit_init();
     idt_flush();
 
     /* Setup page tables and enable paging */

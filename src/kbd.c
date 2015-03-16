@@ -40,11 +40,11 @@ void kbd_handler() {
             shiftkey = FALSE;
     }
 
-    irq_ack(KBD_IRQ);
+    irq_ack(IRQ_ISR_KEYBOARD);
 }
 
 void init_kbd(void) {
-    idt_setup_gate(KBD_IRQ, isrkbd);        
+    idt_setup_gate(IRQ_ISR_KEYBOARD, isrkbd);
 }
 
 

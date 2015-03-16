@@ -172,9 +172,9 @@ void irq_ack(unsigned int irq_no) {
 }
 
 void irq_default_handler(struct irq_registers regs) {
-
     // Timer
     if(regs.irq == 0x20) {
+        printk(".");
         outportb(0x20, 0x20);
         outportb(0xa0,0x20);
         return;

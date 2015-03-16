@@ -77,6 +77,12 @@ void idt_setup_gate(int gate, void (*func_base)());
 void idt_isr_default_handler(struct cpu_registers args);
 
 /* IRQ related, requires PIC to be initialized */
+#define IRQ_NUM_TIMER           0x8
+#define IRQ_NUM_KEYBOARD        0x9
+
+#define IRQ_ISR_TIMER           32
+#define IRQ_ISR_KEYBOARD        33
+
 void idt_init_irq();
 void irq_ack(unsigned int irq_no);
 void irq_default_handler(struct irq_registers regs);
